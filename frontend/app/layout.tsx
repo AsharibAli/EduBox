@@ -6,9 +6,9 @@ import OCIDProvider from "../components/OCIDProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Create Edu Dapp 🔥 | Starter Kit 💻",
+  title: "EduBox | No-Code Tool for EduChain",
   description:
-    "A starter kit for building (Dapps) on the Open Campus L3 (EduChain), powered by create-edu-dapp.",
+    "A no-code tool to configure and deploy your Tokens and NFTs with one click on EduChain.",
 };
 
 export default function RootLayout({
