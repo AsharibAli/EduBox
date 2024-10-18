@@ -1,6 +1,7 @@
-import React from 'react';
-import Link from 'next/link';
-import WalletConnect from './WalletConnect';
+import React from "react";
+import Link from "next/link";
+// Remove or comment out the WalletConnect import until the component is created
+import ConnectWallet from "./ConnectWallet";
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
@@ -23,7 +24,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <Link href="/support" className="hover:text-accent-foreground">
               Support
             </Link>
-            <WalletConnect />
+            <ConnectWallet />
           </div>
         </nav>
       </header>
