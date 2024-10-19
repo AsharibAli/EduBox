@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} bg-teal-50 bg-grid-pattern min-h-screen`}>
         <OCIDProvider>{children}</OCIDProvider>
       </body>
     </html>

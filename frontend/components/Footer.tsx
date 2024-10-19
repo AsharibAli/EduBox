@@ -1,47 +1,44 @@
-import Image from "next/image";
-import React from "react";
+import { FaTwitter, FaGithub, FaTelegram } from "react-icons/fa";
 
-const Footer = () => {
+export default function Footer() {
   return (
-    <footer className="footer text-center p-4 mt-8 w-full bg-white ">
-      <div className="flex items-center justify-center space-x-4">
-        <Image
-          src="https://www.opencampus.xyz/static/media/coin-logo.39cbd6c42530e57817a5b98ac7621ca7.svg"
-          alt="logo"
-          width="50"
-          height="50"
-        />
-        <h1 className="text-xl text-black">
-          Learn more about Open Campus L3{" "}
-          <strong>
-            <a
-              href="https://www.opencampus.xyz/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-teal-300 no-underline hover:underline hover:text-teal-700"
-            >
-              (EduChain)
-            </a>{" "}
-          </strong>
-          ,{" "}
+    <footer className="bg-white shadow-md mt-8 py-4">
+      <div className="container mx-auto flex justify-between items-center px-4">
+        <strong className="text-sm text-teal-600">
+          &copy; 2024 EduBox |{" "}
           <a
-            className="text-teal-300 no-underline hover:underline hover:text-teal-700"
-            href="https://open-campus-docs.vercel.app/"
+            href="https://eduhub.dev"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Go to Documentation.
+            EduHub
           </a>
-        </h1>
-        <Image
-          src="https://www.opencampus.xyz/static/media/coin-logo.39cbd6c42530e57817a5b98ac7621ca7.svg"
-          alt="logo"
-          width="50"
-          height="50"
-        />
+          . All rights reserved.
+        </strong>
+        <div className="flex space-x-4 text-2xl">
+          <a
+            href="https://twitter.com/eduhub__"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaTwitter className="text-gray-600 hover:text-teal-500" />
+          </a>
+          <a
+            href="https://github.com/EduHub-Dev"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaGithub className="text-gray-600 hover:text-teal-500" />
+          </a>
+          <a
+            href="https://t.me/+2LHHeOdkZvJmZWJk"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaTelegram className="text-gray-600 hover:text-teal-500" />
+          </a>
+        </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

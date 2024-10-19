@@ -1,41 +1,40 @@
 import React from "react";
+import Image from "next/image";
+import ConnectWallet from "./ConnectWallet";
+import Link from "next/link";
 
-const Header = () => {
+interface HeaderProps {
+  isConnected: boolean;
+  onConnect: () => void;
+  onDisconnect: () => void;
+}
+
+export default function Header({
+  isConnected,
+  onConnect,
+  onDisconnect,
+}: HeaderProps) {
   return (
-    <div className="w-full fixed top-0 bg-white z-50">
-      <div className="text-center mb-4 p-4 border-b border-gray-300 text-xl">
-        <h1>
-          ⚡A starter kit for building{" "}
-          <strong className="text-teal-300 no-underline hover:underline hover:text-teal-700">
-            (Dapps)
-          </strong>{" "}
-          on the Open Campus L3{" "}
-          <strong>
-            <a
-              href="https://www.opencampus.xyz/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-teal-300 no-underline hover:underline hover:text-teal-700"
-            >
-              (EduChain)
-            </a>
-          </strong>
-          , powered by{" "}
-          <strong>
-            {" "}
-            <a
-              href="https://www.npmjs.com/package/create-edu-dapp"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-teal-300 no-underline hover:underline hover:text-teal-700"
-            >
-              create-edu-dapp 🚀
-            </a>
-          </strong>
-        </h1>
+    <header className="bg-white shadow-md p-4">
+      <div className="container mx-auto flex justify-between items-center">
+        <div className="flex items-center">
+          <Image
+            src="/eduhub.webp"
+            alt="EduHub Logo"
+            className="h-8 w-8 mr-2"
+            width={100}
+            height={100}
+          />
+          <Link href="/">
+            <span className="text-3xl font-bold text-teal-600">EduBox</span>
+          </Link>
+        </div>
+        <ConnectWallet
+          isConnected={isConnected}
+          onConnect={onConnect}
+          onDisconnect={onDisconnect}
+        />
       </div>
-    </div>
+    </header>
   );
-};
-
-export default Header;
+}
