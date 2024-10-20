@@ -62,9 +62,11 @@ export default function Home() {
         {isConnected && (
           <div className="text-center mb-8">
             <p className="text-sm text-gray-600">
-              Connected Address: {accountAddress}
+              <strong> Connected Address:</strong> {accountAddress}
             </p>
-            <p className="text-sm text-gray-600">Balance: {balance} EDU</p>
+            <p className="text-sm text-gray-600">
+              <strong>Balance:</strong> {balance} EDU
+            </p>
           </div>
         )}
 
