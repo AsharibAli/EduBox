@@ -6,7 +6,7 @@ async function main() {
   console.log("Deploying EduBoxERC721 with account:", deployer.address);
 
   const EduBoxERC721 = await hre.ethers.getContractFactory("EduBoxERC721");
-  const nft = await EduBoxERC721.deploy("EduBox NFT", "EDUNFT", "https://api.edubox.com/token/");
+  const nft = await EduBoxERC721.deploy("EduBox NFT", "EDUNFT", "https://box.eduhub.dev/");
 
   // Wait for the contract to be mined
   await nft.waitForDeployment();
