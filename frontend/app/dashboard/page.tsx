@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +8,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { FaCoins, FaPalette } from "react-icons/fa";
 import { CONTRACT_ADDRESSES } from "@/lib/config";
+import ERC20FactoryJson from "@/contracts/EduBoxERC20Factory.sol/EduBoxERC20Factory.json";
 import ERC20Json from "@/contracts/EduBoxERC20.sol/EduBoxERC20.json";
+import ERC721FactoryJson from "@/contracts/EduBoxERC721Factory.sol/EduBoxERC721Factory.json";
 import ERC721Json from "@/contracts/EduBoxERC721.sol/EduBoxERC721.json";
 import Link from "next/link";
 
@@ -17,19 +19,17 @@ interface TokenInfo {
   name: string;
   symbol: string;
   totalSupply: string;
+  decimals: number;
+  cap: string;
+  logoURL: string;
+  website: string;
+  socialMediaLinks: string;
 }
 
 interface NFTInfo {
   address: string;
-  name: any;
-  symbol: any;
-  tokenURI: string;
-}
-
-declare global {
-  interface Window {
-    ethereum?: any;
-  }
+  name: string;
+  symbol: string;
 }
 
 export default function Dashboard() {
@@ -43,7 +43,11 @@ export default function Dashboard() {
 
   const { toast } = useToast();
 
-  const checkWalletConnection = useCallback(async () => {
+  useEffect(() => {
+    checkWalletConnection();
+  }, []);
+
+  const checkWalletConnection = async () => {
     if (typeof window.ethereum !== "undefined") {
       try {
         const web3Instance = new Web3(window.ethereum);
@@ -85,12 +89,7 @@ export default function Dashboard() {
         variant: "destructive",
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [toast]);
-
-  useEffect(() => {
-    checkWalletConnection();
-  }, [checkWalletConnection]);
+  };
 
   const disconnectWallet = () => {
     setIsConnected(false);
@@ -119,105 +118,95 @@ export default function Dashboard() {
 
       // Fetch ERC20 tokens
       const erc20Factory = new web3Instance.eth.Contract(
-        ERC20Json.abi as any,
+        ERC20FactoryJson.abi as any,
         CONTRACT_ADDRESSES.EduBoxERC20Factory
       );
-      const erc20TransferEvents = await erc20Factory.getPastEvents("Transfer", {
-        filter: {
-          from: "0x0000000000000000000000000000000000000000",
-          to: account,
-        },
-        fromBlock: 0,
-        toBlock: "latest",
-      });
-
-      const tokenPromises = erc20TransferEvents.map(async (event: any) => {
-        try {
-          const tokenAddress = event.returnValues.to;
-          const tokenContract = new web3Instance.eth.Contract(
-            ERC20Json.abi as any,
-            tokenAddress
-          );
-          const [name, symbol, totalSupply]: any = await Promise.all([
-            tokenContract.methods.name().call(),
-            tokenContract.methods.symbol().call(),
-            tokenContract.methods.totalSupply().call(),
-          ]);
-          return {
-            address: tokenAddress,
-            name,
-            symbol,
-            totalSupply: web3Instance.utils.fromWei(totalSupply, "ether"),
-          };
-        } catch (error) {
-          console.error("Error fetching token details:", error);
-          return null;
-        }
-      });
-
-      const fetchedTokens = (await Promise.all(tokenPromises)).filter(
-        (token): token is TokenInfo => token !== null
-      );
-      setTokens(fetchedTokens);
-
-      // Fetch ERC721 NFTs
-      const erc721Factory = new web3Instance.eth.Contract(
-        ERC721Json.abi as any,
-        CONTRACT_ADDRESSES.EduBoxERC721Factory
-      );
-      const erc721TransferEvents = await erc721Factory.getPastEvents(
-        "Transfer",
+      const erc20CreationEvents = await erc20Factory.getPastEvents(
+        "TokenCreated",
         {
-          filter: {
-            from: "0x0000000000000000000000000000000000000000",
-            to: account,
-          },
+          filter: { owner: account },
           fromBlock: 0,
           toBlock: "latest",
         }
       );
 
-      const nftPromises = erc721TransferEvents.map(async (event: any) => {
-        try {
-          const nftAddress = event.returnValues.to;
-          const nftContract = new web3Instance.eth.Contract(
-            ERC721Json.abi as any,
-            nftAddress
-          );
-          const [name, symbol] = await Promise.all([
-            nftContract.methods.name().call(),
-            nftContract.methods.symbol().call(),
-          ]);
-          let tokenURI = "";
-          try {
-            tokenURI = await nftContract.methods.tokenURI(1).call();
-          } catch (error) {
-            console.error("Error fetching tokenURI:", error);
-          }
-          return {
-            address: nftAddress,
-            name,
-            symbol,
-            tokenURI,
-          };
-        } catch (error) {
-          console.error("Error fetching NFT details:", error);
-          return null;
-        }
+      const tokenPromises = erc20CreationEvents.map(async (event: any) => {
+        const tokenAddress = event.returnValues.tokenAddress;
+        const tokenContract = new web3Instance.eth.Contract(
+          ERC20Json.abi as any,
+          tokenAddress
+        );
+        const [
+          name,
+          symbol,
+          totalSupply,
+          decimals,
+          cap,
+          logoURL,
+          website,
+          socialMediaLinks,
+        ]: any = await Promise.all([
+          tokenContract.methods.name().call(),
+          tokenContract.methods.symbol().call(),
+          tokenContract.methods.totalSupply().call(),
+          tokenContract.methods.decimals().call(),
+          tokenContract.methods.cap().call(),
+          tokenContract.methods.logoURL().call(),
+          tokenContract.methods.website().call(),
+          tokenContract.methods.socialMediaLinks().call(),
+        ]);
+        return {
+          address: tokenAddress,
+          name,
+          symbol,
+          totalSupply: web3Instance.utils.fromWei(totalSupply, "ether"),
+          decimals: parseInt(decimals),
+          cap: web3Instance.utils.fromWei(cap, "ether"),
+          logoURL,
+          website,
+          socialMediaLinks,
+        };
       });
 
-      const fetchedNFTs: any[] = (await Promise.all(nftPromises)).filter(
-        (nft): nft is NFTInfo => nft !== null
+      const fetchedTokens: any = await Promise.all(tokenPromises);
+      setTokens(fetchedTokens);
+
+      // Fetch ERC721 NFTs
+      const erc721Factory = new web3Instance.eth.Contract(
+        ERC721FactoryJson.abi as any,
+        CONTRACT_ADDRESSES.EduBoxERC721Factory
       );
+      const erc721DeploymentEvents = await erc721Factory.getPastEvents(
+        "NFTContractDeployed",
+        {
+          filter: { owner: account },
+          fromBlock: 0,
+          toBlock: "latest",
+        }
+      );
+
+      const nftPromises = erc721DeploymentEvents.map(async (event: any) => {
+        const nftAddress = event.returnValues.nftContract;
+        const nftContract = new web3Instance.eth.Contract(
+          ERC721Json.abi as any,
+          nftAddress
+        );
+        const [name, symbol]: any = await Promise.all([
+          nftContract.methods.name().call(),
+          nftContract.methods.symbol().call(),
+        ]);
+        return {
+          address: nftAddress,
+          name,
+          symbol,
+        };
+      });
+
+      const fetchedNFTs: any = await Promise.all(nftPromises);
       setNFTs(fetchedNFTs);
     } catch (error) {
       console.error("Error fetching deployed contracts:", error);
-      toast({
-        title: "Fetch Error",
-        description:
-          "Failed to fetch your deployed contracts. Please try again.",
-        variant: "destructive",
-      });
+      throw error;
     }
   };
 
@@ -236,10 +225,10 @@ export default function Dashboard() {
         {isConnected ? (
           <div className="mb-8 text-center bg-white p-4 rounded-lg shadow">
             <p className="text-lg">
-              <strong>Address:</strong> {accountAddress}
+              <strong>Wallet Address:</strong> {accountAddress}
             </p>
             <p className="text-lg">
-              <strong>Balance:</strong> {balance} ETH
+              <strong>Balance:</strong> {balance} EDU
             </p>
           </div>
         ) : (
@@ -287,12 +276,59 @@ export default function Dashboard() {
                       </CardHeader>
                       <CardContent>
                         <p className="mb-2">
-                          <strong>Address:</strong> {token.address}
+                          <strong>Contract Address:</strong> {token.address}
                         </p>
-                        <p>
+                        <p className="mb-2">
                           <strong>Total Supply:</strong> {token.totalSupply}{" "}
                           {token.symbol}
                         </p>
+                        <p className="mb-2">
+                          <strong>Decimals:</strong> {token.decimals}
+                        </p>
+                        {token.cap && (
+                          <p className="mb-2">
+                            <strong>Cap:</strong> {token.cap} {token.symbol}
+                          </p>
+                        )}
+                        {token.logoURL && (
+                          <p className="mb-2">
+                            <strong>Logo:</strong>{" "}
+                            <a
+                              href={token.logoURL}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-500 hover:underline"
+                            >
+                              View Logo
+                            </a>
+                          </p>
+                        )}
+                        {token.website && (
+                          <p className="mb-2">
+                            <strong>Website:</strong>{" "}
+                            <a
+                              href={token.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-500 hover:underline"
+                            >
+                              {token.website}
+                            </a>
+                          </p>
+                        )}
+                        {token.socialMediaLinks && (
+                          <p className="mb-2">
+                            <strong>Social Media:</strong>{" "}
+                            <a
+                              href={token.socialMediaLinks}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-500 hover:underline"
+                            >
+                              {token.socialMediaLinks}
+                            </a>
+                          </p>
+                        )}
                       </CardContent>
                     </Card>
                   ))}
@@ -302,14 +338,14 @@ export default function Dashboard() {
 
             <section>
               <h2 className="text-2xl font-semibold mb-4 text-teal-700">
-                Your NFT Collections
+                Your ERC721 NFT Collections
               </h2>
               {nfts.length === 0 ? (
                 <p className="text-center bg-white p-4 rounded-lg shadow">
                   No NFT collections deployed yet.{" "}
                   <Link href="/deploy-nft">
                     <span className="text-teal-600 hover:text-teal-700 underline cursor-pointer">
-                      Create your first NFT!
+                      Create your first NFT collection!
                     </span>
                   </Link>
                 </p>
@@ -328,10 +364,7 @@ export default function Dashboard() {
                       </CardHeader>
                       <CardContent>
                         <p className="mb-2">
-                          <strong>Address:</strong> {nft.address}
-                        </p>
-                        <p>
-                          <strong>Token URI:</strong> {nft.tokenURI || "N/A"}
+                          <strong>Contract Address:</strong> {nft.address}
                         </p>
                       </CardContent>
                     </Card>
