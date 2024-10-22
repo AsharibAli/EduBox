@@ -166,7 +166,7 @@ export default function DeployToken() {
                   e.preventDefault();
                   deployToken();
                 }}
-                className="space-y-4"
+                className="space-y-6"
               >
                 <div>
                   <Label htmlFor="name">Token Name</Label>
@@ -176,7 +176,12 @@ export default function DeployToken() {
                     onChange={(e) => setName(e.target.value)}
                     required
                     className="mt-1"
+                    placeholder="e.g., My Awesome Token"
                   />
+                  <p className="text-sm text-gray-500 mt-1">
+                    The full name of your token. Choose a unique and descriptive
+                    name.
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="symbol">Token Symbol</Label>
@@ -186,7 +191,11 @@ export default function DeployToken() {
                     onChange={(e) => setSymbol(e.target.value)}
                     required
                     className="mt-1"
+                    placeholder="e.g., MAT"
                   />
+                  <p className="text-sm text-gray-500 mt-1">
+                    A short identifier for your token (usually 3-5 characters).
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="initialSupply">Initial Supply</Label>
@@ -197,7 +206,12 @@ export default function DeployToken() {
                     onChange={(e) => setInitialSupply(e.target.value)}
                     required
                     className="mt-1"
+                    placeholder="e.g., 1000000"
                   />
+                  <p className="text-sm text-gray-500 mt-1">
+                    The initial amount of tokens to mint. This will be
+                    multiplied by 10^decimals.
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="decimals">Decimals</Label>
@@ -208,10 +222,15 @@ export default function DeployToken() {
                     onChange={(e) => setDecimals(e.target.value)}
                     required
                     className="mt-1"
+                    placeholder="e.g., 18"
                   />
+                  <p className="text-sm text-gray-500 mt-1">
+                    The number of decimal places for your token. 18 is standard
+                    for most tokens.
+                  </p>
                 </div>
                 <div>
-                  <Label htmlFor="cap">Cap</Label>
+                  <Label htmlFor="cap">Cap (Maximum Supply)</Label>
                   <Input
                     id="cap"
                     type="number"
@@ -219,7 +238,12 @@ export default function DeployToken() {
                     onChange={(e) => setCap(e.target.value)}
                     required
                     className="mt-1"
+                    placeholder="e.g., 10000000"
                   />
+                  <p className="text-sm text-gray-500 mt-1">
+                    The maximum number of tokens that can ever exist. Set to 0
+                    for no cap.
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="logoURL">Logo URL</Label>
@@ -228,7 +252,12 @@ export default function DeployToken() {
                     value={logoURL}
                     onChange={(e) => setLogoURL(e.target.value)}
                     className="mt-1"
+                    placeholder="e.g., https://example.com/logo.png"
                   />
+                  <p className="text-sm text-gray-500 mt-1">
+                    A URL to your token&apos;s logo image. Leave blank if you
+                    don&apos;t have one.
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="website">Website</Label>
@@ -237,7 +266,12 @@ export default function DeployToken() {
                     value={website}
                     onChange={(e) => setWebsite(e.target.value)}
                     className="mt-1"
+                    placeholder="e.g., https://myawesometoken.com"
                   />
+                  <p className="text-sm text-gray-500 mt-1">
+                    Your token&apos;s official website. Leave blank if you
+                    don&apos;t have one.
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="socialMediaLinks">Social Media Links</Label>
@@ -246,7 +280,11 @@ export default function DeployToken() {
                     value={socialMediaLinks}
                     onChange={(e) => setSocialMediaLinks(e.target.value)}
                     className="mt-1"
+                    placeholder="e.g., https://x.com/mytoken,https://t.me/mytoken"
                   />
+                  <p className="text-sm text-gray-500 mt-1">
+                    Comma-separated list of social media links for your token.
+                  </p>
                 </div>
                 <Button
                   type="submit"

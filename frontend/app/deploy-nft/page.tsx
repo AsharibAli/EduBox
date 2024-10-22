@@ -144,7 +144,7 @@ export default function DeployNFT() {
                   e.preventDefault();
                   deployNFT();
                 }}
-                className="space-y-4"
+                className="space-y-6"
               >
                 <div>
                   <Label htmlFor="name">Collection Name</Label>
@@ -154,7 +154,11 @@ export default function DeployNFT() {
                     onChange={(e) => setName(e.target.value)}
                     required
                     className="mt-1"
+                    placeholder="e.g., My Awesome NFT Collection"
                   />
+                  <p className="text-sm text-gray-500 mt-1">
+                    The name of your NFT collection. Choose a unique and descriptive name.
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="symbol">Collection Symbol</Label>
@@ -164,7 +168,11 @@ export default function DeployNFT() {
                     onChange={(e) => setSymbol(e.target.value)}
                     required
                     className="mt-1"
+                    placeholder="e.g., AWESOME"
                   />
+                  <p className="text-sm text-gray-500 mt-1">
+                    A short, unique identifier for your collection (usually 3-5 characters).
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="baseURI">Base URI</Label>
@@ -174,7 +182,11 @@ export default function DeployNFT() {
                     onChange={(e) => setBaseURI(e.target.value)}
                     required
                     className="mt-1"
+                    placeholder="e.g., https://api.example.com/nft/"
                   />
+                  <p className="text-sm text-gray-500 mt-1">
+                    The base URL for your NFT metadata. This should be a URL that returns JSON metadata for each token ID.
+                  </p>
                 </div>
                 <Button
                   type="submit"
