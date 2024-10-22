@@ -12,12 +12,13 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import Web3 from "web3";
-import contractJson from "@/contracts/EduBoxERC721.sol/EduBoxERC721.json";
-import { CONTRACT_ADDRESSES } from "@/lib/config";
+import factoryAbi from "@/contracts/EduBoxERC721Factory.sol/EduBoxERC721Factory.json";
 import Link from "next/link";
 import { FaPalette } from "react-icons/fa";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+
+const FACTORY_ADDRESS = "0x2e01874fED174bC51DB65b3e7a85C360Cc62c0c1";
 
 export default function DeployNFT() {
   const [name, setName] = useState("");
@@ -81,29 +82,28 @@ export default function DeployNFT() {
         throw new Error("Please connect to the Open Campus Codex network.");
       }
 
-      const contract = new web3.eth.Contract(
-        contractJson.abi,
-        CONTRACT_ADDRESSES.EduBoxERC721
-      );
+      const factory = new web3.eth.Contract(factoryAbi.abi, FACTORY_ADDRESS);
 
-      const mintTransaction = contract.methods.mintNFT(accounts[0], baseURI);
+      const deploymentFee = web3.utils.toWei("1", "ether"); // 1 EDU coin
+      const deployTransaction = factory.methods.deployNFTContract(name, symbol, baseURI);
 
-      const gas = await mintTransaction.estimateGas({ from: accounts[0] });
-      const result = await mintTransaction.send({
+      const gas = await deployTransaction.estimateGas({ from: accounts[0], value: deploymentFee });
+      const result = await deployTransaction.send({
         from: accounts[0],
         gas: gas.toString(),
+        value: deploymentFee,
       });
 
-      const tokenId = result.events?.Transfer?.returnValues?.tokenId;
-      if (!tokenId) {
-        throw new Error("Failed to retrieve token ID from transaction result");
+      if (result.events && 'NFTContractDeployed' in result.events) {
+        const deployedNFTAddress = result.events.NFTContractDeployed.returnValues.nftContract as string;
+        setDeployedNFTAddress(deployedNFTAddress);
+        setIsDeployed(true);
+      } else {
+        console.error('NFTContractDeployed event not found in result');
       }
-
-      setDeployedNFTAddress(result.to);
-      setIsDeployed(true);
       toast({
         title: "NFT Collection Deployed Successfully",
-        description: `NFT with ID ${tokenId} minted to ${accounts[0]}`,
+        description: `NFT contract deployed to ${deployedNFTAddress}`,
       });
     } catch (error) {
       console.error("Error deploying NFT:", error);

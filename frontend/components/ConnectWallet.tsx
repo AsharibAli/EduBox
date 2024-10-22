@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { ethers } from 'ethers';
 
 interface ConnectWalletProps {
   isConnected: boolean;
@@ -28,12 +29,20 @@ export default function ConnectWallet({
           duration: 3000,
         });
       } else {
-        await onConnect();
-        toast({
-          title: "Wallet Connected",
-          description: "Your wallet has been successfully connected.",
-          duration: 3000,
-        });
+        // Explicitly request accounts to trigger MetaMask popup
+        if (typeof window.ethereum !== 'undefined') {
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          await provider.send("eth_requestAccounts", []);
+          await onConnect();
+          toast({
+            title: "Wallet Connected",
+            description: "Your wallet has been successfully connected.",
+            duration: 3000,
+          });
+        } else {
+          throw new Error("MetaMask is not installed");
+        }
       }
     } catch (error) {
       console.error("Wallet action failed:", error);
@@ -41,7 +50,7 @@ export default function ConnectWallet({
         title: "Action Failed",
         description: isConnected
           ? "Failed to disconnect wallet."
-          : "Failed to connect wallet.",
+          : "Failed to connect wallet. Make sure MetaMask is installed and unlocked.",
         variant: "destructive",
         duration: 3000,
       });
