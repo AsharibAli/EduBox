@@ -46,5 +46,3 @@ contract EduBoxERC721 is ERC721, ERC721URIStorage, Ownable {
         return super.tokenURI(tokenId);
     }
 }
-
-// Contract Address: 0x5DF260d169aAE138F35942fD0432Bfa238910D17

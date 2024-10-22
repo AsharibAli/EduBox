@@ -12,7 +12,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import Web3 from "web3";
-import contractJson from "@/contracts/EduBoxERC20.sol/EduBoxERC20.json";
+import factoryAbi from "@/contracts/EduBoxERC20Factory.sol/EduBoxERC20Factory.json";
 import { CONTRACT_ADDRESSES } from "@/lib/config";
 import Link from "next/link";
 import { FaCoins } from "react-icons/fa";
@@ -24,6 +24,10 @@ export default function DeployToken() {
   const [symbol, setSymbol] = useState("");
   const [initialSupply, setInitialSupply] = useState("");
   const [decimals, setDecimals] = useState("18");
+  const [cap, setCap] = useState("");
+  const [logoURL, setLogoURL] = useState("");
+  const [website, setWebsite] = useState("");
+  const [socialMediaLinks, setSocialMediaLinks] = useState("");
   const [isDeploying, setIsDeploying] = useState(false);
   const [isDeployed, setIsDeployed] = useState(false);
   const [deployedTokenAddress, setDeployedTokenAddress] = useState("");
@@ -82,27 +86,46 @@ export default function DeployToken() {
         throw new Error("Please connect to the Open Campus Codex network.");
       }
 
-      const contract = new web3.eth.Contract(
-        contractJson.abi,
-        CONTRACT_ADDRESSES.EduBoxERC20
+      const factory = new web3.eth.Contract(
+        factoryAbi.abi,
+        CONTRACT_ADDRESSES.EduBoxERC20Factory
       );
 
-      const mintTransaction = contract.methods.mint(
-        accounts[0],
-        web3.utils.toWei(initialSupply, "ether")
+      const createTokenTx = factory.methods.createToken(
+        name,
+        symbol,
+        parseInt(decimals),
+        web3.utils.toWei(initialSupply, "ether"),
+        web3.utils.toWei(cap, "ether"),
+        logoURL,
+        website,
+        socialMediaLinks
       );
 
-      const gas = await mintTransaction.estimateGas({ from: accounts[0] });
-      const result = await mintTransaction.send({
+      const gas = await createTokenTx.estimateGas({
         from: accounts[0],
-        gas: gas.toString(),
+        value: web3.utils.toWei("1", "ether"), // 1 native token as creation fee
       });
 
-      setDeployedTokenAddress(result.to);
+      const result = await createTokenTx.send({
+        from: accounts[0],
+        gas: gas.toString(),
+        value: web3.utils.toWei("1", "ether"), // 1 native token as creation fee
+      });
+
+      const tokenCreatedEvent = result.events?.TokenCreated;
+      if (!tokenCreatedEvent) {
+        throw new Error("Token creation event not found");
+      }
+      const tokenAddress = tokenCreatedEvent.returnValues.tokenAddress;
+      if (typeof tokenAddress !== "string") {
+        throw new Error("Invalid token address");
+      }
+      setDeployedTokenAddress(tokenAddress);
       setIsDeployed(true);
       toast({
         title: "Token Deployed Successfully",
-        description: `${initialSupply} tokens minted to ${accounts[0]}`,
+        description: `New token created at ${tokenAddress}`,
       });
     } catch (error) {
       console.error("Error deploying token:", error);
@@ -184,6 +207,44 @@ export default function DeployToken() {
                     value={decimals}
                     onChange={(e) => setDecimals(e.target.value)}
                     required
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="cap">Cap</Label>
+                  <Input
+                    id="cap"
+                    type="number"
+                    value={cap}
+                    onChange={(e) => setCap(e.target.value)}
+                    required
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="logoURL">Logo URL</Label>
+                  <Input
+                    id="logoURL"
+                    value={logoURL}
+                    onChange={(e) => setLogoURL(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="website">Website</Label>
+                  <Input
+                    id="website"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="socialMediaLinks">Social Media Links</Label>
+                  <Input
+                    id="socialMediaLinks"
+                    value={socialMediaLinks}
+                    onChange={(e) => setSocialMediaLinks(e.target.value)}
                     className="mt-1"
                   />
                 </div>
