@@ -120,7 +120,7 @@ export default function Dashboard() {
       // Fetch ERC20 tokens
       const erc20Factory = new web3Instance.eth.Contract(
         ERC20Json.abi as any,
-        CONTRACT_ADDRESSES.EduBoxERC20
+        CONTRACT_ADDRESSES.EduBoxERC20Factory
       );
       const erc20TransferEvents = await erc20Factory.getPastEvents("Transfer", {
         filter: {
@@ -163,7 +163,7 @@ export default function Dashboard() {
       // Fetch ERC721 NFTs
       const erc721Factory = new web3Instance.eth.Contract(
         ERC721Json.abi as any,
-        CONTRACT_ADDRESSES.EduBoxERC721
+        CONTRACT_ADDRESSES.EduBoxERC721Factory
       );
       const erc721TransferEvents = await erc721Factory.getPastEvents(
         "Transfer",
