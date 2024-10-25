@@ -279,15 +279,16 @@ export default function Dashboard() {
                           <strong>Contract Address:</strong> {token.address}
                         </p>
                         <p className="mb-2">
-                          <strong>Total Supply:</strong> {token.totalSupply}{" "}
-                          {token.symbol}
+                          <strong>Decimals:</strong> {token.decimals}
                         </p>
                         <p className="mb-2">
-                          <strong>Decimals:</strong> {token.decimals}
+                          <strong>Initial Supply:</strong> {token.totalSupply}{" "}
+                          {token.symbol}
                         </p>
                         {token.cap && (
                           <p className="mb-2">
-                            <strong>Cap:</strong> {token.cap} {token.symbol}
+                            <strong>Maximum Supply:</strong> {token.cap}{" "}
+                            {token.symbol}
                           </p>
                         )}
                         {token.logoURL && (
@@ -318,7 +319,7 @@ export default function Dashboard() {
                         )}
                         {token.socialMediaLinks && (
                           <p className="mb-2">
-                            <strong>Social Media:</strong>{" "}
+                            <strong>Twitter:</strong>{" "}
                             <a
                               href={token.socialMediaLinks}
                               target="_blank"

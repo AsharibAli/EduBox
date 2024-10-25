@@ -198,22 +198,6 @@ export default function DeployToken() {
                   </p>
                 </div>
                 <div>
-                  <Label htmlFor="initialSupply">Initial Supply</Label>
-                  <Input
-                    id="initialSupply"
-                    type="number"
-                    value={initialSupply}
-                    onChange={(e) => setInitialSupply(e.target.value)}
-                    required
-                    className="mt-1"
-                    placeholder="e.g., 1000000"
-                  />
-                  <p className="text-sm text-gray-500 mt-1">
-                    The initial amount of tokens to mint. This will be
-                    multiplied by 10^decimals.
-                  </p>
-                </div>
-                <div>
                   <Label htmlFor="decimals">Decimals</Label>
                   <Input
                     id="decimals"
@@ -230,7 +214,23 @@ export default function DeployToken() {
                   </p>
                 </div>
                 <div>
-                  <Label htmlFor="cap">Cap (Maximum Supply)</Label>
+                  <Label htmlFor="initialSupply">Initial Supply</Label>
+                  <Input
+                    id="initialSupply"
+                    type="number"
+                    value={initialSupply}
+                    onChange={(e) => setInitialSupply(e.target.value)}
+                    required
+                    className="mt-1"
+                    placeholder="e.g., 1000"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">
+                    The initial amount of tokens to mint. This will be
+                    multiplied by 10^decimals.
+                  </p>
+                </div>
+                <div>
+                  <Label htmlFor="cap">Maximum Supply</Label>
                   <Input
                     id="cap"
                     type="number"
@@ -238,7 +238,7 @@ export default function DeployToken() {
                     onChange={(e) => setCap(e.target.value)}
                     required
                     className="mt-1"
-                    placeholder="e.g., 10000000"
+                    placeholder="e.g., 10000"
                   />
                   <p className="text-sm text-gray-500 mt-1">
                     The maximum number of tokens that can ever exist. Set to 0
@@ -274,16 +274,23 @@ export default function DeployToken() {
                   </p>
                 </div>
                 <div>
-                  <Label htmlFor="socialMediaLinks">Social Media Links</Label>
+                  <Label htmlFor="socialMediaLinks">Twitter Link</Label>
                   <Input
                     id="socialMediaLinks"
                     value={socialMediaLinks}
                     onChange={(e) => setSocialMediaLinks(e.target.value)}
                     className="mt-1"
-                    placeholder="e.g., https://x.com/mytoken,https://t.me/mytoken"
+                    placeholder="e.g., https://x.com/mytoken"
                   />
                   <p className="text-sm text-gray-500 mt-1">
-                    Comma-separated list of social media links for your token.
+                    Your token&apos;s Twitter/X profile link. Leave blank if you
+                    don&apos;t have one.
+                  </p>
+                </div>
+                {/* Add the new message here */}
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
+                  <p className="text-blue-700 text-sm">
+                    <strong>Note:</strong> Creating a token costs 1 $EDU token!
                   </p>
                 </div>
                 <Button

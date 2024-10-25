@@ -85,21 +85,29 @@ export default function DeployNFT() {
       const factory = new web3.eth.Contract(factoryAbi.abi, FACTORY_ADDRESS);
 
       const deploymentFee = web3.utils.toWei("1", "ether"); // 1 EDU coin
-      const deployTransaction = factory.methods.deployNFTContract(name, symbol, baseURI);
+      const deployTransaction = factory.methods.deployNFTContract(
+        name,
+        symbol,
+        baseURI
+      );
 
-      const gas = await deployTransaction.estimateGas({ from: accounts[0], value: deploymentFee });
+      const gas = await deployTransaction.estimateGas({
+        from: accounts[0],
+        value: deploymentFee,
+      });
       const result = await deployTransaction.send({
         from: accounts[0],
         gas: gas.toString(),
         value: deploymentFee,
       });
 
-      if (result.events && 'NFTContractDeployed' in result.events) {
-        const deployedNFTAddress = result.events.NFTContractDeployed.returnValues.nftContract as string;
+      if (result.events && "NFTContractDeployed" in result.events) {
+        const deployedNFTAddress = result.events.NFTContractDeployed
+          .returnValues.nftContract as string;
         setDeployedNFTAddress(deployedNFTAddress);
         setIsDeployed(true);
       } else {
-        console.error('NFTContractDeployed event not found in result');
+        console.error("NFTContractDeployed event not found in result");
       }
       toast({
         title: "NFT Collection Deployed Successfully",
@@ -135,7 +143,8 @@ export default function DeployNFT() {
                 <FaPalette className="mr-2" /> Deploy Your NFT Collection
               </CardTitle>
               <CardDescription>
-                Fill in the details to create your ERC721 NFT collection on EduChain
+                Fill in the details to create your ERC721 NFT collection on
+                EduChain
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -157,7 +166,8 @@ export default function DeployNFT() {
                     placeholder="e.g., My Awesome NFT Collection"
                   />
                   <p className="text-sm text-gray-500 mt-1">
-                    The name of your NFT collection. Choose a unique and descriptive name.
+                    The name of your NFT collection. Choose a unique and
+                    descriptive name.
                   </p>
                 </div>
                 <div>
@@ -171,7 +181,8 @@ export default function DeployNFT() {
                     placeholder="e.g., AWESOME"
                   />
                   <p className="text-sm text-gray-500 mt-1">
-                    A short, unique identifier for your collection (usually 3-5 characters).
+                    A short, unique identifier for your collection (usually 3-5
+                    characters).
                   </p>
                 </div>
                 <div>
@@ -185,7 +196,15 @@ export default function DeployNFT() {
                     placeholder="e.g., https://api.example.com/nft/"
                   />
                   <p className="text-sm text-gray-500 mt-1">
-                    The base URL for your NFT metadata. This should be a URL that returns JSON metadata for each token ID.
+                    The base URL for your NFT metadata. This should be a URL
+                    that returns JSON metadata for each token ID.
+                  </p>
+                </div>
+                {/* Add the new message here */}
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
+                  <p className="text-blue-700 text-sm">
+                    <strong>Note:</strong> Creating a NFT collection costs 1
+                    $EDU token!
                   </p>
                 </div>
                 <Button
