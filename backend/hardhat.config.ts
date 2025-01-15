@@ -12,16 +12,20 @@ const config: HardhatUserConfig = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200,
-      },
-    },
+        runs: 200
+      }
+    }
   },
   paths: {
     artifacts: "./src",
   },
   networks: {
-    opencampus: {
-      url: `https://rpc.open-campus-codex.gelato.digital/`,
+    "educhain-testnet": {
+      url: `https://rpc.open-campus-codex.gelato.digital`,
+      accounts: [ACCOUNT_PRIVATE_KEY],
+    },
+    "educhain-mainnet": {
+      url: `https://rpc.edu-chain.raas.gelato.cloud`,
       accounts: [ACCOUNT_PRIVATE_KEY],
     },
   },
@@ -30,15 +34,24 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      opencampus: "xxx",
+      'educhain-testnet': "xxx",
+      'educhain-mainnet': "xxx",
     },
     customChains: [
       {
-        network: "opencampus",
+        network: "educhain-testnet",
         chainId: 656476,
         urls: {
-          apiURL: "https://opencampus-codex.blockscout.com/api/",
-          browserURL: "opencampus-codex.blockscout.com",
+          apiURL: "https://edu-chain-testnet.blockscout.com/api/",
+          browserURL: "https://edu-chain-testnet.blockscout.com",
+        },
+      },
+      {
+        network: "educhain-mainnet",
+        chainId: 656475,
+        urls: {
+          apiURL: "https://educhain.blockscout.com/api/",
+          browserURL: "https://educhain.blockscout.com",
         },
       },
     ],

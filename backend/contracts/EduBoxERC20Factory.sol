@@ -5,8 +5,8 @@ import "./EduBoxERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract EduBoxERC20Factory is Ownable {
-    uint256 public constant CREATION_FEE = 1 ether; // 1 native token
-
+    uint256 public constant CREATION_FEE = 1 ether;
+    address public feeRecipient;
     struct TokenInfo {
         address tokenAddress;
         string name;
@@ -16,6 +16,8 @@ contract EduBoxERC20Factory is Ownable {
 
     TokenInfo[] public createdTokens;
 
+    event FeeRecipientUpdated(address indexed newRecipient);
+
     event TokenCreated(
         address indexed tokenAddress,
         string name,
@@ -23,7 +25,9 @@ contract EduBoxERC20Factory is Ownable {
         address indexed owner
     );
 
-    constructor() {}
+    constructor() {
+        feeRecipient = 0x89486a59fB05196745c50e80F9ACe761e919D77d;
+    }
 
     function createToken(
         string memory name,
@@ -43,6 +47,14 @@ contract EduBoxERC20Factory is Ownable {
             cap >= initialSupply,
             "Cap must be greater than or equal to initial supply"
         );
+
+        // Transfer fee to recipient
+        payable(feeRecipient).transfer(CREATION_FEE);
+
+        // Refund excess
+        if (msg.value > CREATION_FEE) {
+            payable(msg.sender).transfer(msg.value - CREATION_FEE);
+        }
 
         EduBoxERC20 newToken = new EduBoxERC20(
             name,
@@ -66,6 +78,12 @@ contract EduBoxERC20Factory is Ownable {
         );
 
         emit TokenCreated(address(newToken), name, symbol, msg.sender);
+    }
+
+    function setFeeRecipient(address _newRecipient) external onlyOwner {
+        require(_newRecipient != address(0), "Invalid address");
+        feeRecipient = _newRecipient;
+        emit FeeRecipientUpdated(_newRecipient);
     }
 
     function getTokenCount() public view returns (uint256) {
