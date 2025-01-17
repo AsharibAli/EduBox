@@ -58,6 +58,9 @@ export default function Home() {
         <p className="text-center text-gray-600 mb-8">
           Configure and deploy your Tokens and NFTs with one click on EduChain.
         </p>
+        <p className="text-center text-gray-600 mb-8">
+         <strong>➡️ EduBox is going live on EduChain Mainnet in 24 Hours 👀 </strong>
+        </p>
 
         {isConnected && (
           <div className="text-center mb-8">
