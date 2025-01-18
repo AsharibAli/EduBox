@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import OCIDProvider from "../components/OCIDProvider";
 import Script from "next/script";
+import Banner from "@/components/Banner";
+import { BannerProvider } from "@/components/BannerContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,10 +34,13 @@ export default function RootLayout({
   gtag('config', 'G-THTQTN90XW');
   `}
       </Script>
-      <body
-        className={`${inter.className} bg-teal-50 bg-grid-pattern min-h-screen`}
-      >
-        <OCIDProvider>{children}</OCIDProvider>
+      <body className={inter.className}>
+        <BannerProvider>
+          <Banner />
+          <OCIDProvider>
+          {children}
+          </OCIDProvider>
+        </BannerProvider>
       </body>
     </html>
   );
