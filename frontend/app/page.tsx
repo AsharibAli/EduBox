@@ -56,10 +56,10 @@ export default function Home() {
           EduBox | No-Code Tool
         </h1>
         <p className="text-center text-gray-600 mb-8">
-          Configure and deploy your Tokens and NFTs with one click on EduChain.
+          Configure and deploy your Tokens and NFTs with one click on EduChain (Live on Testnet).
         </p>
         <p className="text-center text-gray-600 mb-8">
-         <strong>➡️ EduBox is going live on EduChain Mainnet in 24 Hours 👀 </strong>
+         <strong>➡️ New version of EduBox is coming on EduChain Mainnet in 7 days 👀</strong>
         </p>
 
         {isConnected && (

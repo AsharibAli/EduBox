@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="bg-white shadow-md mt-8 py-4">
       <div className="container mx-auto flex justify-between items-center px-4">
         <strong className="text-sm text-teal-600">
-          &copy; 2024 EduBox |{" "}
+        &copy; {new Date().getFullYear().toString()} EduBox | {" "}
           <a
             href="https://eduhub.dev"
             target="_blank"
