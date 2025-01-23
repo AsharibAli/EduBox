@@ -19,5 +19,4 @@ main()
     console.error(error);
     process.exit(1);
   });
-
-//   contract address: EduBoxERC20Factory deployed to: 0xB99647a08741C044ddAB9cB0A53d079833725f17
+  

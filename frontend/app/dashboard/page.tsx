@@ -107,10 +107,10 @@ export default function Dashboard() {
     try {
       const networkId = await web3Instance.eth.net.getId();
 
-      if (networkId !== BigInt(656476)) {
+      if (networkId !== BigInt(41923)) {
         toast({
           title: "Wrong Network",
-          description: "Please connect to the Open Campus Codex network.",
+          description: "Please connect to the EDU Chain Mainnet.",
           variant: "destructive",
         });
         return;
@@ -276,7 +276,18 @@ export default function Dashboard() {
                       </CardHeader>
                       <CardContent>
                         <p className="mb-2">
-                          <strong>Contract Address:</strong> {token.address}
+                          <strong>Contract Address:</strong> 
+                          {" "}
+                            <a
+                              href={`https://educhain.blockscout.com/address/${token.address}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-500 hover:underline"
+                            >
+                              {token.address}
+                            </a>
+                          
+                           
                         </p>
                         <p className="mb-2">
                           <strong>Decimals:</strong> {token.decimals}

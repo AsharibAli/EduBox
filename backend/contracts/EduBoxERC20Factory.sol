@@ -26,7 +26,7 @@ contract EduBoxERC20Factory is Ownable {
     );
 
     constructor() {
-        feeRecipient = 0x89486a59fB05196745c50e80F9ACe761e919D77d;
+        feeRecipient = 0x1fcb879Bf709ccDfc2C2CFB39aFD836a63612e58;
     }
 
     function createToken(

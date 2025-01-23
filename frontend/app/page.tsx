@@ -56,12 +56,8 @@ export default function Home() {
           EduBox | No-Code Tool
         </h1>
         <p className="text-center text-gray-600 mb-8">
-          Configure and deploy your Tokens and NFTs with one click on EduChain (Live on Testnet).
+         <strong>➡️ Configure and deploy your Tokens and NFTs with one click on EduChain Mainnet 👀</strong> 
         </p>
-        <p className="text-center text-gray-600 mb-8">
-         <strong>➡️ New version of EduBox is coming on EduChain Mainnet in 7 days 👀</strong>
-        </p>
-
         {isConnected && (
           <div className="text-center mb-8">
             <p className="text-sm text-gray-600">
@@ -111,11 +107,11 @@ export default function Home() {
                 Create your own NFT collection with customizable metadata.
               </p>
               {isConnected ? (
-                <Link href="/deploy-nft" passHref>
+                // <Link href="/deploy-nft" passHref>
                   <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white">
-                    Deploy NFT
+                    Coming soon ✨
                   </Button>
-                </Link>
+                // </Link>
               ) : (
                 <Button
                   className="w-full bg-gray-300 text-gray-500 cursor-not-allowed"

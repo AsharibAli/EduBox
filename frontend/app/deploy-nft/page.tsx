@@ -78,8 +78,8 @@ export default function DeployNFT() {
       const accounts = await web3.eth.getAccounts();
       const networkId = await web3.eth.net.getId();
 
-      if (networkId !== BigInt(656476)) {
-        throw new Error("Please connect to the Open Campus Codex network.");
+      if (networkId !== BigInt(41923)) {
+        throw new Error("Please connect to the EDU Chain Mainnet.");
       }
 
       const factory = new web3.eth.Contract(factoryAbi.abi, FACTORY_ADDRESS);

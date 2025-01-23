@@ -1,5 +1,3 @@
 # Mainnet Deployed Contracts
 
-EduBoxERC20Factory deployed to: 0xB6A25bE698c89bE90944B19B7a0bf8128fe31206
-
-EduBoxERC721Factory deployed to: 0xC9a3C702622E2EaA1404396050cD626F4375C585
+EduBoxERC20Factory deployed to: 0x611eC959cE7911779EEda894809078E684d494Cd
