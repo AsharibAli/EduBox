@@ -1,5 +1,5 @@
 # `create-edu-dapp` Hardhat Implementation | Backend
-
+asas
 This project demonstrates a basic Hardhat implementation. It comes with a sample contract, a test for that contract, and a script that deploys and verify that contract on the Open Campus L3 chain.
 
 ## Setup
@@ -24,10 +24,10 @@ npx hardhat compile
 npx hardhat test
 
 # For deloying the smart contracts
-npx hardhat run scripts/deploy.ts --network opencampus
+npx hardhat run scripts/deploy_erc721_factory.js --network educhain-mainnet
 
 # For verifying the smart contracts
-npx hardhat verify --network opencampus <deployed-contract-address>
+npx hardhat verify --network educhain-mainnet <deployed-contract-address>
 
 # Display help information for Hardhat
 npx hardhat help

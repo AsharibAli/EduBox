@@ -1,22 +1,16 @@
-const { ethers } = require("hardhat");
+const hre = require("hardhat");
 
 async function main() {
-  // Define fee recipient address
-  const feeRecipient = "0x89486a59fB05196745c50e80F9ACe761e919D77d";
+  const [deployer] = await hre.ethers.getSigners();
 
-  // Deploy Factory
-  console.log("Deploying EduBoxERC721Factory...");
-  const Factory = await ethers.getContractFactory("EduBoxERC721Factory");
-  const factory = await Factory.deploy(feeRecipient);
+  console.log("Deploying EduBoxERC721Factory with account:", deployer.address);
+
+  const EduBoxERC721Factory = await hre.ethers.getContractFactory("EduBoxERC721Factory");
+  const factory = await EduBoxERC721Factory.deploy();
+
   await factory.waitForDeployment();
 
-  const factoryAddress = await factory.getAddress();
-  console.log("EduBoxERC721Factory deployed to:", factoryAddress);
-  console.log("Fee recipient set to:", feeRecipient);
-
-  // Verify fee recipient
-  const setFeeRecipient = await factory.feeRecipient();
-  console.log("Verified fee recipient:", setFeeRecipient);
+  console.log("EduBoxERC721Factory deployed to:", await factory.getAddress());
 }
 
 main()

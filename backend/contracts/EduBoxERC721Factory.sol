@@ -5,9 +5,9 @@ import "./EduBoxERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract EduBoxERC721Factory is Ownable {
-    uint256 public deploymentFee = 1 ether; // 1 EDU coin
+    uint256 public constant CREATION_FEE = 1 ether; // 1 EDU token
     address public feeRecipient;
-    
+
     struct CollectionInfo {
         address contractAddress;
         string name;
@@ -16,28 +16,22 @@ contract EduBoxERC721Factory is Ownable {
         string collectionURI;
         uint256 maxSupply;
         uint256 mintPrice;
-        uint96 royaltyFee;
         address owner;
     }
-    
+
     CollectionInfo[] public deployedCollections;
-    mapping(address => CollectionInfo[]) public userCollections;
-    
+
     event NFTContractDeployed(
         address indexed owner,
         address indexed nftContract,
         string name,
         string symbol,
         uint256 maxSupply,
-        uint256 mintPrice,
-        uint96 royaltyFee
+        uint256 mintPrice
     );
-    event DeploymentFeeUpdated(uint256 newFee);
-    event FeeRecipientUpdated(address newRecipient);
 
-    constructor(address _feeRecipient) {
-        require(_feeRecipient != address(0), "Invalid fee recipient");
-        feeRecipient = 0x89486a59fB05196745c50e80F9ACe761e919D77d;
+    constructor() {
+        feeRecipient = 0x1fcb879Bf709ccDfc2C2CFB39aFD836a63612e58;
     }
 
     function deployNFTContract(
@@ -46,83 +40,75 @@ contract EduBoxERC721Factory is Ownable {
         string memory baseTokenURI,
         string memory collectionURI,
         uint256 maxSupply,
-        uint256 mintPrice,
-        uint96 royaltyFee
+        uint256 mintPrice
     ) public payable returns (address) {
-        require(msg.value >= deploymentFee, "Insufficient deployment fee");
+        require(msg.value >= CREATION_FEE, "Insufficient creation fee");
         require(maxSupply > 0, "Max supply must be greater than 0");
-        require(royaltyFee <= 10000, "Royalty fee cannot exceed 100%");
-        
+
+        // Transfer fee to recipient
+        payable(feeRecipient).transfer(CREATION_FEE);
+
+        // Refund excess
+        if (msg.value > CREATION_FEE) {
+            payable(msg.sender).transfer(msg.value - CREATION_FEE);
+        }
+
         // Deploy new EduBoxERC721 contract
         EduBoxERC721 newContract = new EduBoxERC721(
             name,
             symbol,
             baseTokenURI,
             maxSupply,
-            mintPrice,
-            royaltyFee
+            mintPrice
         );
-        
+
         // Set collection URI
         newContract.setCollectionURI(collectionURI);
-        
+
         // Transfer ownership to the caller
         newContract.transferOwnership(msg.sender);
-        
+
         // Store collection info
-        CollectionInfo memory newCollection = CollectionInfo({
-            contractAddress: address(newContract),
-            name: name,
-            symbol: symbol,
-            baseURI: baseTokenURI,
-            collectionURI: collectionURI,
-            maxSupply: maxSupply,
-            mintPrice: mintPrice,
-            royaltyFee: royaltyFee,
-            owner: msg.sender
-        });
-        
-        deployedCollections.push(newCollection);
-        userCollections[msg.sender].push(newCollection);
-        
-        // Transfer the deployment fee to the fee recipient
-        payable(feeRecipient).transfer(deploymentFee);
-        
-        // Refund any excess payment
-        if (msg.value > deploymentFee) {
-            payable(msg.sender).transfer(msg.value - deploymentFee);
-        }
-        
+        deployedCollections.push(
+            CollectionInfo({
+                contractAddress: address(newContract),
+                name: name,
+                symbol: symbol,
+                baseURI: baseTokenURI,
+                collectionURI: collectionURI,
+                maxSupply: maxSupply,
+                mintPrice: mintPrice,
+                owner: msg.sender
+            })
+        );
+
         emit NFTContractDeployed(
             msg.sender,
             address(newContract),
             name,
             symbol,
             maxSupply,
-            mintPrice,
-            royaltyFee
+            mintPrice
         );
-        
+
         return address(newContract);
     }
 
-    function getDeployedCollections() public view returns (CollectionInfo[] memory) {
+    function getDeployedCollections()
+        public
+        view
+        returns (CollectionInfo[] memory)
+    {
         return deployedCollections;
     }
 
-    function getUserCollections(address user) public view returns (CollectionInfo[] memory) {
-        return userCollections[user];
+    function getCollectionCount() public view returns (uint256) {
+        return deployedCollections.length;
     }
 
-    function setDeploymentFee(uint256 newFee) public onlyOwner {
-        deploymentFee = newFee;
-        emit DeploymentFeeUpdated(newFee);
-    }
-
-    function setFeeRecipient(address newRecipient) public onlyOwner {
-        require(newRecipient != address(0), "Invalid fee recipient");
-        feeRecipient = newRecipient;
-        emit FeeRecipientUpdated(newRecipient);
+    function setFeeRecipient(address _newRecipient) external onlyOwner {
+        require(_newRecipient != address(0), "Invalid address");
+        feeRecipient = _newRecipient;
     }
 
     function withdraw() public onlyOwner {

@@ -13,17 +13,19 @@ import {
 } from "@/components/ui/card";
 import Web3 from "web3";
 import factoryAbi from "@/contracts/EduBoxERC721Factory.sol/EduBoxERC721Factory.json";
+import { CONTRACT_ADDRESSES } from "@/lib/config";
 import Link from "next/link";
 import { FaPalette } from "react-icons/fa";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-const FACTORY_ADDRESS = "0x2e01874fED174bC51DB65b3e7a85C360Cc62c0c1";
-
 export default function DeployNFT() {
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
-  const [baseURI, setBaseURI] = useState("");
+  const [baseTokenURI, setBaseTokenURI] = useState("");
+  const [collectionURI, setCollectionURI] = useState("");
+  const [maxSupply, setMaxSupply] = useState("");
+  const [mintPrice, setMintPrice] = useState("");
   const [isDeploying, setIsDeploying] = useState(false);
   const [isDeployed, setIsDeployed] = useState(false);
   const [deployedNFTAddress, setDeployedNFTAddress] = useState("");
@@ -82,45 +84,53 @@ export default function DeployNFT() {
         throw new Error("Please connect to the EDU Chain Mainnet.");
       }
 
-      const factory = new web3.eth.Contract(factoryAbi.abi, FACTORY_ADDRESS);
-
-      const deploymentFee = web3.utils.toWei("1", "ether"); // 1 EDU coin
-      const deployTransaction = factory.methods.deployNFTContract(
-        name,
-        symbol,
-        baseURI
+      const factory = new web3.eth.Contract(
+        factoryAbi.abi,
+        CONTRACT_ADDRESSES.EduBoxERC721Factory
       );
 
-      const gas = await deployTransaction.estimateGas({
+      const deployNFTTx = factory.methods.deployNFTContract(
+        name,
+        symbol,
+        baseTokenURI,
+        collectionURI,
+        maxSupply,
+        web3.utils.toWei(mintPrice, "ether")
+      );
+
+      const gas = await deployNFTTx.estimateGas({
         from: accounts[0],
-        value: deploymentFee,
-      });
-      const result = await deployTransaction.send({
-        from: accounts[0],
-        gas: gas.toString(),
-        value: deploymentFee,
+        value: web3.utils.toWei("1", "ether"), // 1 EDU token as creation fee
       });
 
-      if (result.events && "NFTContractDeployed" in result.events) {
-        const deployedNFTAddress = result.events.NFTContractDeployed
-          .returnValues.nftContract as string;
-        setDeployedNFTAddress(deployedNFTAddress);
-        setIsDeployed(true);
-      } else {
-        console.error("NFTContractDeployed event not found in result");
+      const result = await deployNFTTx.send({
+        from: accounts[0],
+        gas: gas.toString(),
+        value: web3.utils.toWei("1", "ether"), // 1 EDU token as creation fee
+      });
+
+      const nftDeployedEvent = result.events?.NFTContractDeployed;
+      if (!nftDeployedEvent) {
+        throw new Error("NFT contract deployment event not found");
       }
+      const nftAddress = nftDeployedEvent.returnValues.nftContract;
+      if (typeof nftAddress !== "string") {
+        throw new Error("Invalid NFT contract address");
+      }
+      setDeployedNFTAddress(nftAddress);
+      setIsDeployed(true);
       toast({
         title: "NFT Collection Deployed Successfully",
-        description: `NFT contract deployed to ${deployedNFTAddress}`,
+        description: `New NFT collection created at ${nftAddress}`,
       });
     } catch (error) {
-      console.error("Error deploying NFT:", error);
+      console.error("Error deploying NFT collection:", error);
       toast({
         title: "Deployment Error",
         description:
           error instanceof Error
             ? error.message
-            : "Failed to deploy NFT. Please try again.",
+            : "Failed to deploy NFT collection. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -181,26 +191,73 @@ export default function DeployNFT() {
                     placeholder="e.g., AWESOME"
                   />
                   <p className="text-sm text-gray-500 mt-1">
-                    A short, unique identifier for your collection (usually 3-5
+                    A short identifier for your collection (usually 3-5
                     characters).
                   </p>
                 </div>
                 <div>
-                  <Label htmlFor="baseURI">Base URI</Label>
+                  <Label htmlFor="baseTokenURI">Base Token URI</Label>
                   <Input
-                    id="baseURI"
-                    value={baseURI}
-                    onChange={(e) => setBaseURI(e.target.value)}
+                    id="baseTokenURI"
+                    value={baseTokenURI}
+                    onChange={(e) => setBaseTokenURI(e.target.value)}
                     required
                     className="mt-1"
                     placeholder="e.g., https://api.example.com/nft/"
                   />
                   <p className="text-sm text-gray-500 mt-1">
-                    The base URL for your NFT metadata. This should be a URL
-                    that returns JSON metadata for each token ID.
+                    The base URI for your NFT metadata. This will be used to
+                    fetch metadata for each token.
                   </p>
                 </div>
-                {/* Add the new message here */}
+                <div>
+                  <Label htmlFor="collectionURI">Collection URI</Label>
+                  <Input
+                    id="collectionURI"
+                    value={collectionURI}
+                    onChange={(e) => setCollectionURI(e.target.value)}
+                    required
+                    className="mt-1"
+                    placeholder="e.g., https://example.com/collection-metadata"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">
+                    The URI for your collection metadata. This should contain
+                    information about the entire collection.
+                  </p>
+                </div>
+                <div>
+                  <Label htmlFor="maxSupply">Maximum Supply</Label>
+                  <Input
+                    id="maxSupply"
+                    type="number"
+                    value={maxSupply}
+                    onChange={(e) => setMaxSupply(e.target.value)}
+                    required
+                    className="mt-1"
+                    placeholder="e.g., 10000"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">
+                    The maximum number of NFTs that can be minted in this
+                    collection.
+                  </p>
+                </div>
+                <div>
+                  <Label htmlFor="mintPrice">Mint Price (EDU)</Label>
+                  <Input
+                    id="mintPrice"
+                    type="number"
+                    step="0.000000000000000001"
+                    value={mintPrice}
+                    onChange={(e) => setMintPrice(e.target.value)}
+                    required
+                    className="mt-1"
+                    placeholder="e.g., 0.1"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">
+                    The price in EDU tokens to mint each NFT from this
+                    collection.
+                  </p>
+                </div>
                 <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
                   <p className="text-blue-700 text-sm">
                     <strong>Note:</strong> Creating a NFT collection costs 1

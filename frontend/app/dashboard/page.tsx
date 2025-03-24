@@ -30,6 +30,10 @@ interface NFTInfo {
   address: string;
   name: string;
   symbol: string;
+  baseURI?: string;
+  collectionURI?: string;
+  maxSupply?: string;
+  mintPrice?: string;
 }
 
 export default function Dashboard() {
@@ -191,15 +195,62 @@ export default function Dashboard() {
           ERC721Json.abi as any,
           nftAddress
         );
-        const [name, symbol]: any = await Promise.all([
-          nftContract.methods.name().call(),
-          nftContract.methods.symbol().call(),
-        ]);
-        return {
-          address: nftAddress,
-          name,
-          symbol,
-        };
+
+        // Add additional method calls to fetch the extra NFT information
+        try {
+          const [name, symbol, mintPrice]: any = await Promise.all([
+            nftContract.methods.name().call(),
+            nftContract.methods.symbol().call(),
+            nftContract.methods.mintPrice().call(),
+          ]);
+
+          // Fetch maxSupply separately with better error handling
+          let maxSupply = "N/A";
+          try {
+            const maxSupplyResult: any = await nftContract.methods
+              .maxSupply()
+              .call();
+            // Convert from BigNumber/hex string if needed
+            maxSupply = web3Instance.utils.isHexStrict(maxSupplyResult)
+              ? web3Instance.utils.hexToNumberString(maxSupplyResult)
+              : maxSupplyResult.toString();
+          } catch (error) {
+            console.error("Error fetching maxSupply:", error);
+          }
+
+          // Fetch collectionURI separately
+          let collectionURI = "";
+          try {
+            collectionURI = await nftContract.methods.collectionURI().call();
+          } catch (error) {
+            console.error("Error fetching collectionURI:", error);
+          }
+
+          // For debugging
+          console.log("NFT Contract Data:", {
+            address: nftAddress,
+            name,
+            symbol,
+            maxSupply,
+            mintPrice,
+          });
+
+          return {
+            address: nftAddress,
+            name,
+            symbol,
+            collectionURI,
+            maxSupply,
+            mintPrice: web3Instance.utils.fromWei(mintPrice, "ether"),
+          };
+        } catch (error) {
+          console.error(`Error fetching data for NFT at ${nftAddress}:`, error);
+          return {
+            address: nftAddress,
+            name: "Error loading",
+            symbol: "???",
+          };
+        }
       });
 
       const fetchedNFTs: any = await Promise.all(nftPromises);
@@ -276,18 +327,15 @@ export default function Dashboard() {
                       </CardHeader>
                       <CardContent>
                         <p className="mb-2">
-                          <strong>Contract Address:</strong> 
-                          {" "}
-                            <a
-                              href={`https://educhain.blockscout.com/address/${token.address}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-500 hover:underline"
-                            >
-                              {token.address}
-                            </a>
-                          
-                           
+                          <strong>Contract Address:</strong>{" "}
+                          <a
+                            href={`https://educhain.blockscout.com/address/${token.address}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:underline"
+                          >
+                            {token.address}
+                          </a>
                         </p>
                         <p className="mb-2">
                           <strong>Decimals:</strong> {token.decimals}
@@ -376,8 +424,39 @@ export default function Dashboard() {
                       </CardHeader>
                       <CardContent>
                         <p className="mb-2">
-                          <strong>Contract Address:</strong> {nft.address}
+                          <strong>Contract Address:</strong>{" "}
+                          <a
+                            href={`https://educhain.blockscout.com/address/${nft.address}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:underline"
+                          >
+                            {nft.address}
+                          </a>
                         </p>
+                        {nft.maxSupply && (
+                          <p className="mb-2">
+                            <strong>Maximum Supply:</strong> {nft.maxSupply}
+                          </p>
+                        )}
+                        {nft.mintPrice && (
+                          <p className="mb-2">
+                            <strong>Mint Price:</strong> {nft.mintPrice} EDU
+                          </p>
+                        )}
+                        {nft.collectionURI && (
+                          <p className="mb-2">
+                            <strong>Collection Metadata:</strong>{" "}
+                            <a
+                              href={nft.collectionURI}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-500 hover:underline"
+                            >
+                              View Collection Metadata
+                            </a>
+                          </p>
+                        )}
                       </CardContent>
                     </Card>
                   ))}
