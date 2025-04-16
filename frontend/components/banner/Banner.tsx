@@ -15,21 +15,20 @@ import { cn } from "@/lib/utils";
 import { useBanner } from "./BannerContext";
 
 const BANNER_CONFIG = {
-  title: "➡️ Eid Mubarak - 100k Yuzu Giveaway 🍊",
+  title: "➡️ Agent NFT - AI x Blockchain 🤖",
   description:
-    "We're giving away 100k Yuzu to our community! Wishing you a wonderful day full of delicious food and amazing vibes.",
+    "Hold Agent NFT to get access to EduAgent (The First AI Agent for EduChain), Share a prize pool of 1-2 million Yuzu Points, and unlock future benefits.",
   buttons: {
     primary: {
-      text: "Participate Here",
-      href: "https://x.com/eduhub__/status/1906367899301990565",
+      text: "Purchase Here",
+      href: "https://ed3.xyz/discover/launchpad/0xADA256fB3Fc28f40692EF385c5890c4Ea242664e",
     },
     secondary: {
-      text: "Visit Docs",
-      href: "https://docs.eduhub.dev/",
+      text: "More Info",
+      href: "https://x.com/eduhub__/status/1910693515509850434",
     },
   },
 };
-
 const Banner = () => {
   const { isVisible, hideBanner } = useBanner();
   const router = useRouter();
